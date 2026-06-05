@@ -1,0 +1,596 @@
+{
+  "datasets": [
+    {
+      "name": "agent_actions",
+      "displayName": "AI Agent Actions",
+      "queryLines": [
+        "SELECT\n",
+        "  *\n",
+        "FROM\n",
+        "  agent_actions"
+      ],
+      "catalog": "retail_catalog1",
+      "schema": "gold"
+    },
+    {
+      "name": "transactions_data",
+      "displayName": "Transactions Data",
+      "queryLines": [
+        "SELECT\n",
+        "  *\n",
+        "FROM\n",
+        "  retail_catalog1.gold.transactions_gold"
+      ],
+      "catalog": "retail_catalog1",
+      "schema": "gold"
+    },
+    {
+      "name": "payment_summary",
+      "displayName": "Payment Summary",
+      "queryLines": [
+        "SELECT\n",
+        "  payment_type,\n",
+        "  transaction_count,\n",
+        "  total_amount\n",
+        "FROM\n",
+        "  payment_summary"
+      ],
+      "catalog": "retail_catalog1",
+      "schema": "gold"
+    },
+    {
+      "name": "daily_sales_trend",
+      "displayName": "Daily Sales Trend",
+      "queryLines": [
+        "SELECT\n",
+        "  sale_date,\n",
+        "  daily_sales,\n",
+        "  daily_transactions\n",
+        "FROM\n",
+        "  daily_sales_summary\n",
+        "ORDER BY\n",
+        "  sale_date"
+      ],
+      "catalog": "retail_catalog1",
+      "schema": "gold"
+    },
+    {
+      "name": "store_sales_metrics",
+      "displayName": "Store Sales Metrics",
+      "config": {
+        "version": "1.1",
+        "source": "retail_catalog1.gold.store_sales_summary",
+        "dimensions": [
+          {
+            "name": "store_id",
+            "expr": "store_id"
+          }
+        ],
+        "measures": [
+          {
+            "name": "total_revenue",
+            "expr": "SUM(total_sales)",
+            "displayName": "Total Revenue"
+          },
+          {
+            "name": "store_count",
+            "expr": "COUNT(DISTINCT store_id)",
+            "displayName": "Total Stores"
+          },
+          {
+            "name": "total_sales",
+            "expr": "SUM(total_sales)",
+            "displayName": "Total Sales"
+          }
+        ]
+      }
+    }
+  ],
+  "pages": [
+    {
+      "name": "71e1cfa6",
+      "displayName": "dataset",
+      "layout": [
+        {
+          "widget": {
+            "name": "total_revenue",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "store_sales_metrics",
+                  "fields": [
+                    {
+                      "name": "measure(total_revenue)",
+                      "expression": "MEASURE(`total_revenue`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "title": "Total Revenue",
+                "showTitle": true
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(total_revenue)",
+                  "format": {
+                    "type": "number-currency",
+                    "abbreviation": "compact",
+                    "currencyCode": "USD",
+                    "decimalPlaces": {
+                      "type": "exact",
+                      "places": 2
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "total_transactions",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "transactions_data",
+                  "fields": [
+                    {
+                      "name": "count(*)",
+                      "expression": "COUNT(`*`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "title": "Total Transactions",
+                "showTitle": true
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "count(*)",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "compact",
+                    "decimalPlaces": {
+                      "type": "exact",
+                      "places": 0
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 0,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "total_stores",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "store_sales_metrics",
+                  "fields": [
+                    {
+                      "name": "measure(store_count)",
+                      "expression": "MEASURE(`store_count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "title": "Total Stores",
+                "showTitle": true
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(store_count)",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "none",
+                    "decimalPlaces": {
+                      "type": "exact",
+                      "places": 0
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 0,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "store_revenue_bar",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "store_sales_metrics",
+                  "fields": [
+                    {
+                      "name": "store_id",
+                      "expression": "`store_id`"
+                    },
+                    {
+                      "name": "measure(total_sales)",
+                      "expression": "MEASURE(`total_sales`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "title": "Store Revenue Analysis",
+                "showTitle": true
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "store_id",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "y-reversed"
+                    }
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(total_sales)",
+                  "format": {
+                    "type": "number-currency",
+                    "abbreviation": "compact",
+                    "currencyCode": "USD",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 6,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "payment_distribution_pie",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "payment_summary",
+                  "fields": [
+                    {
+                      "name": "transaction_count",
+                      "expression": "`transaction_count`"
+                    },
+                    {
+                      "name": "payment_type",
+                      "expression": "`payment_type`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "title": "Payment Method Distribution",
+                "showTitle": true
+              },
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "transaction_count",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "compact",
+                    "decimalPlaces": {
+                      "type": "exact",
+                      "places": 0
+                    }
+                  }
+                },
+                "color": {
+                  "fieldName": "payment_type",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "angle-reversed"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 3,
+            "width": 6,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "daily_revenue_line",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "daily_sales_trend",
+                  "fields": [
+                    {
+                      "name": "sale_date",
+                      "expression": "`sale_date`"
+                    },
+                    {
+                      "name": "daily_sales",
+                      "expression": "`daily_sales`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "title": "Daily Revenue Trend",
+                "showTitle": true
+              },
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "sale_date",
+                  "scale": {
+                    "type": "temporal"
+                  }
+                },
+                "y": {
+                  "fieldName": "daily_sales",
+                  "format": {
+                    "type": "number-currency",
+                    "abbreviation": "compact",
+                    "currencyCode": "USD",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 8,
+            "width": 12,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "best_store_counter",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "store_sales_metrics",
+                  "fields": [
+                    {
+                      "name": "store_id",
+                      "expression": "`store_id`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "title": "Best Performing Store",
+                "showTitle": true
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "store_id"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 13,
+            "width": 4,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "fraud_detection_table",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "transactions_data",
+                  "fields": [
+                    {
+                      "name": "amount",
+                      "expression": "`amount`"
+                    },
+                    {
+                      "name": "anomaly_score",
+                      "expression": "`anomaly_score`"
+                    },
+                    {
+                      "name": "is_anomaly",
+                      "expression": "`is_anomaly`"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "CAST(`amount` AS DOUBLE) > 10000"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "title": "Fraud Detection / High Value Transactions",
+                "showTitle": true
+              },
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "amount"
+                  },
+                  {
+                    "fieldName": "anomaly_score"
+                  },
+                  {
+                    "fieldName": "is_anomaly"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 13,
+            "width": 4,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "ai_agent_table",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "agent_actions",
+                  "fields": [
+                    {
+                      "name": "actions",
+                      "expression": "`actions`"
+                    },
+                    {
+                      "name": "total_rows",
+                      "expression": "`total_rows`"
+                    },
+                    {
+                      "name": "invalid_rows",
+                      "expression": "`invalid_rows`"
+                    },
+                    {
+                      "name": "invalid_ratio",
+                      "expression": "`invalid_ratio`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "title": "AI Agent Decisions",
+                "showTitle": true
+              },
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "actions"
+                  },
+                  {
+                    "fieldName": "total_rows"
+                  },
+                  {
+                    "fieldName": "invalid_rows"
+                  },
+                  {
+                    "fieldName": "invalid_ratio"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 13,
+            "width": 4,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}
