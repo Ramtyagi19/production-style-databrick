@@ -48,6 +48,12 @@ env:
           --data '{
             "job_id": 899095022343923
           }'
+     - name: Debug Host
+       run:
+       echo "HOST=$DATABRICKS_HOST"
+       echo "TOKEN LENGTH=${#DATABRICKS_TOKEN}"
+    
+       
 
       - name: CI/CD Completed
         run: |
