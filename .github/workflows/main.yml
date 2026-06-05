@@ -42,7 +42,7 @@ jobs:
 
       - name: Deploy Notebooks
         run: |
-          databricks workspace import_dir Notebooks /Production_ETL --overwrite
+          databricks workspace import_dir Notebook /Production_ETL --overwrite
 
       - name: Trigger ETL Job
         run: |
