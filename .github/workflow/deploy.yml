@@ -1,23 +1,55 @@
-name: Databricks Deployment
+name: Databricks ETL CI/CD Pipeline
 
 on:
   push:
     branches:
       - main
 
+  workflow_dispatch:
+
 jobs:
-  deploy:
+  deploy-to-databricks:
 
     runs-on: ubuntu-latest
 
+env:
+  DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+  DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+
     steps:
 
-      - name: Checkout Repo
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install Databricks CLI
-        run: pip install databricks-cli
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-      - name: Deploy Notebooks
+      - name: Install Databricks CLI
         run: |
-          databricks workspace import_dir notebooks /Production_ETL
+          python -m pip install --upgrade pip
+          pip install databricks-cli
+
+      - name: Verify Databricks Connection
+        run: |
+          databricks workspace ls /
+
+      - name: Deploy Notebooks to Databricks Workspace
+        run: |
+          databricks workspace import_dir notebooks /Production_ETL --overwrite
+
+      - name: Trigger Databricks ETL Job
+        run: |
+          curl --request POST \
+          --url "$DATABRICKS_HOST/api/2.1/jobs/run-now" \
+          --header "Authorization: Bearer $DATABRICKS_TOKEN" \
+          --header "Content-Type: application/json" \
+          --data '{
+            "job_id": 899095022343923
+          }'
+
+      - name: CI/CD Completed
+        run: |
+          echo "Databricks deployment successful"
+          echo "ETL Job triggered successfully"
